@@ -60,6 +60,7 @@ class AttributeRelationship:
 		for node in nodes:
 			if not self.graph.has_node(node):
 				print(node)
+				spdx = node
 				continue
 			descendants = list(nx.descendants(self.graph, node))
 			ancestors = list(nx.ancestors(self.graph, node))
