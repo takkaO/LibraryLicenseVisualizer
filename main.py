@@ -69,7 +69,14 @@ def create_license_tree_by_library(organized_scan_result):
             for spdx, values in license_group.items():
                 for path, score in values:
                     sub_key = "OtherFiles"
-                    if re.search(rf".*/{lib_name}/licen(s|c)e.*", path, re.IGNORECASE):
+                    manual_checked = False
+                    if re.search(rf".*/{lib_name}/licen(s|c)e.manual_checked$", path, re.IGNORECASE):
+                        if spdx != "NoLicense":
+                            manual_checked = True
+                            sub_key = "LicenseFiles"
+                        else:
+                            continue
+                    elif re.search(rf".*/{lib_name}/licen(s|c)e.*", path, re.IGNORECASE):
                         if spdx != "NoLicense":
                             sub_key = "LicenseFiles"
                         else:
@@ -84,13 +91,17 @@ def create_license_tree_by_library(organized_scan_result):
                             sub_key = "ReadmeFiles"
                         else:
                             continue
+                    elif re.search(r".*licen(s|c)e.*", path, re.IGNORECASE):
+                        pass
+                    elif re.search(r".*copyright.*", path, re.IGNORECASE):
+                        pass
                     elif not re.search(
                         r".*\.(c|cpp|cp|cxx|cc|h|hpp|hp)?$", path, re.IGNORECASE
                     ):
                         continue
 
                     tree[lib_name][sub_key][spdx].append(
-                        {"path": path, "score": score, "modified": False}
+                        {"path": path, "score": score, "manual_checked": manual_checked}
                     )
     return tree
 

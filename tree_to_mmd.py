@@ -46,8 +46,8 @@ def create_project_table(lib_name: str, project_license, evidence={}):
             if not item["score"] == 100:
                 icon = "⚠️"
 
-            if item["modified"] is True:
-                icon = "🖊️"
+            if item["manual_checked"] is True:
+                icon = "🆗"
 
             txt += f"""<td nowrap style="text-align:center;">{icon}</td>
 				<td nowrap style="text-align:left;">{spdx}</td>
@@ -103,8 +103,8 @@ def create_license_group_table(
             icon = "✅"
             if not file_info["score"] == 100:
                 icon = "⚠️"
-            if file_info["modified"] is True:
-                icon = "🖊️"
+            if file_info["manual_checked"] is True:
+                icon = "🆗"
 
             txt += f"""<tr style="background-color: whitesmoke;">
             <td style="text-align:center;">{icon}</td>
