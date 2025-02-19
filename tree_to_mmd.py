@@ -75,8 +75,13 @@ def create_license_group_table(
     if len(file_license_tree.keys()) < 2 or project_license == "Unknown":
         hide_NoLicense = False
 
+    regex = re.compile(r".*\.(c|cpp|cp|cxx|cc|h|hpp|hp)?$")
+
     for spdx, items in file_license_tree.items():
-        if hide_NoLicense is True and spdx == "NoLicense":
+        # if hide_NoLicense is True and spdx == "NoLicense":
+        #     continue
+
+        if all(not regex.search(item['path'], re.IGNORECASE) for item in items):
             continue
 
         color = "skyblue"
@@ -98,20 +103,28 @@ def create_license_group_table(
 				</thead>
 				<tbody style="">
 		"""
-
-        for file_info in items:
-            icon = "✅"
-            if not file_info["score"] == 100:
-                icon = "⚠️"
-            if file_info["manual_checked"] is True:
-                icon = "🆗"
-
+        if hide_NoLicense is True and spdx == "NoLicense":
             txt += f"""<tr style="background-color: whitesmoke;">
-            <td style="text-align:center;">{icon}</td>
-            <td style="text-align:left;">{file_info["path"]}</td>
-            <td style="text-align:right; color: blue; font-size: x-small; vertical-align: bottom; padding-left:2em; padding-right:0.5em;">{file_info["score"]}%</td>
-			</tr>
-			"""
+                <td style="text-align:center;">❔</td>
+                <td style="text-align:left;">{len(items)} ファイル</td>
+                <td style="text-align:right; color: blue; font-size: x-small; vertical-align: bottom; padding-left:2em; padding-right:0.5em;">--</td>
+                </tr>
+                """
+        else:
+            for file_info in items:
+            
+                icon = "✅"
+                if not file_info["score"] == 100:
+                    icon = "⚠️"
+                if file_info["manual_checked"] is True:
+                    icon = "🆗"
+
+                txt += f"""<tr style="background-color: whitesmoke;">
+                <td style="text-align:center;">{icon}</td>
+                <td style="text-align:left;">{file_info["path"]}</td>
+                <td style="text-align:right; color: blue; font-size: x-small; vertical-align: bottom; padding-left:2em; padding-right:0.5em;">{file_info["score"]}%</td>
+                </tr>
+                """
 
         txt += f"""</tbody>
 			</table>
@@ -163,7 +176,7 @@ def export_to_mermaidjs(license_tree):
             txt += create_project_table(lib_name, project_license)
 
         txt += create_license_group_table(
-            lib_name, category["OtherFiles"], project_license, hide_NoLicense=True
+            lib_name, category["OtherFiles"], project_license, hide_NoLicense=False
         )
 
     os.makedirs("./output/", exist_ok=True)
